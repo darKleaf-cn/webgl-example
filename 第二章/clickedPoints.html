@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>webgl学习</title>
+</head>
+
+<body>
+	<canvas id="webgl" width="200" height="500">
+	</canvas>
+
+	<script src="../lib/webgl-utils.js"></script>
+	<script src="../lib/webgl-debug.js"></script>
+	<script src="../lib/cuon-utils.js"></script>
+	<script>
+		/** @type {HTMLCanvasElement} */
+		const canvas = document.getElementById('webgl');
+		/** @type {WebGLRenderingContext} */
+		const gl = getWebGLContext(canvas);
+
+		const vertexShaderSource = `
+			attribute vec4 a_position;
+			void main(){
+				gl_PointSize = 10.0;
+				gl_Position = a_position;
+			}
+		`;
+		const fragShaderSource = `
+			void main(){
+			  gl_FragColor = vec4(0.0,1.0,0.0,1.0);
+			}
+		`;
+
+		const points = [];
+
+		function main() {
+			//初始化着色器
+			initShaders(gl, vertexShaderSource, fragShaderSource);
+			const a_position = gl.getAttribLocation(gl.program, 'a_position');
+			canvas.onmousedown = function (e) {
+				click(e, gl, canvas, a_position);
+			}
+			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+		}
+		function click(e, gl, canvas, a_position) {
+			let x = e.clientX;
+			let y = e.clientY;
+			const rect = e.target.getBoundingClientRect();
+			console.log(rect)
+			x = ((x - rect.left) - canvas.width / 2) / (canvas.width / 2);
+			y = (canvas.height / 2 - (y - rect.top)) / (canvas.height / 2);
+			points.push(x, y);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			for (let i = 0; i < points.length; i += 2) {
+				gl.vertexAttrib3f(a_position, points[i], points[i + 1], 0.0);
+				gl.drawArrays(gl.POINTS, 0, 1);
+			}
+		}
+
+		main();
+
+	</script>
+</body>
+
+</html>

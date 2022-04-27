@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>使用WebGL绘制一个点</title>
+</head>
+
+<body>
+	<canvas id="webgl" width="500" height="500">
+		1212121
+	</canvas>
+
+	<script src="../lib/webgl-utils.js"></script>
+	<script src="../lib/webgl-debug.js"></script>
+	<script src="../lib/cuon-utils.js"></script>
+	<script>
+		/** @type {HTMLCanvasElement} */
+		var canvas = document.getElementById('webgl');
+		/** @type {WebGLRenderingContext} */
+		var gl = getWebGLContext(canvas);
+
+		//顶点着色器源码
+		var vertexShaderSource = '' +
+			'void main(){' +
+			'   gl_PointSize=10.0;' +
+			'   gl_Position =vec4(0.0,0.0,0.0,1.0);' +
+			'}';
+
+		var fragShaderSource = '' +
+			'void main(){' +
+			'   gl_FragColor = vec4(1.0,0.0,0.0,1.0);' +
+			'}';
+
+		//初始化着色器
+		initShaders(gl, vertexShaderSource, fragShaderSource);
+
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.clear(gl.COLOR_BUFFER_BIT);
+		gl.drawArrays(gl.POINTS, 0, 1);
+	</script>
+</body>
+
+</html>
