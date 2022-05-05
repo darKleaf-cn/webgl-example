@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>webgl学习</title>
+</head>
+
+<body>
+	<canvas id="webgl" width="500" height="500">
+	</canvas>
+
+	<script src="../lib/webgl-utils.js"></script>
+	<script src="../lib/webgl-debug.js"></script>
+	<script src="../lib/cuon-utils.js"></script>
+	<script>
+		/** @type {HTMLCanvasElement} */
+		const canvas = document.getElementById('webgl');
+		/** @type {WebGLRenderingContext} */
+		const gl = getWebGLContext(canvas);
+
+		const vertexShaderSource = `
+			attribute vec4 a_position;
+			void main(){
+				gl_Position = a_position;
+			}
+		`;
+		const fragShaderSource = `
+			void main(){
+			  gl_FragColor = vec4(0.0,1.0,0.0,1.0);;
+			}
+		`;
+
+		const points = [];
+		const colors = [];
+
+		function main() {
+			//初始化着色器
+			initShaders(gl, vertexShaderSource, fragShaderSource);
+			const n = initVertexBuffers(gl);
+			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			gl.drawArrays(gl.TRIANGLES, 0, n);
+		}
+
+		function initVertexBuffers(/** @type {WebGLRenderingContext} */gl) {
+			const vertices = new Float32Array([
+				0.0, 0.5, -0.5, -0.5, 0.5, -0.5
+			])
+			const n = 3;
+
+			// 创建缓冲区对象
+			const vertexBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+			const a_position = gl.getAttribLocation(gl.program, 'a_position');
+			gl.vertexAttribPointer(a_position, 2, gl.FLOAT, false, 0, 0);
+			gl.enableVertexAttribArray(a_position);
+			return n;
+		}
+
+		main();
+
+	</script>
+</body>
+
+</html>

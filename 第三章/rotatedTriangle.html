@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>webgl学习</title>
+</head>
+
+<body>
+	<canvas id="webgl" width="500" height="500">
+	</canvas>
+
+	<script src="../lib/webgl-utils.js"></script>
+	<script src="../lib/webgl-debug.js"></script>
+	<script src="../lib/cuon-utils.js"></script>
+	<script>
+		/** @type {HTMLCanvasElement} */
+		const canvas = document.getElementById('webgl');
+		/** @type {WebGLRenderingContext} */
+		const gl = getWebGLContext(canvas);
+
+		const vertexShaderSource = `
+			attribute vec4 a_Position;
+			uniform float u_CosB, u_SinB;
+			void main(){
+				gl_Position.x = a_Position.x * u_CosB - a_Position.y * u_SinB;
+				gl_Position.y = a_Position.x * u_SinB + a_Position.y * u_CosB;
+				gl_Position.z = a_Position.z;
+				gl_Position.w = 1.0;
+			}
+		`;
+		const fragShaderSource = `
+			void main(){
+			  gl_FragColor = vec4(0.0,1.0,0.0,1.0);;
+			}
+		`;
+		const Tx = 0.5;
+		const Ty = 0.5;
+		const Tz = 0.0;
+		const angle = 90.0;
+		const points = [];
+		const colors = [];
+
+		function main() {
+			//初始化着色器
+			initShaders(gl, vertexShaderSource, fragShaderSource);
+			const n = initVertexBuffers(gl);
+			// 旋转
+			const radian = Math.PI * angle / 180.0;
+			const cosB = Math.cos(radian);
+			const sinB = Math.sin(radian);
+
+			const u_CosB = gl.getUniformLocation(gl.program, 'u_CosB');
+			const u_SinB = gl.getUniformLocation(gl.program, 'u_SinB');
+			gl.uniform1f(u_CosB, cosB);
+			gl.uniform1f(u_SinB, sinB);
+
+			// 设置背景色
+			gl.clearColor(0.0, 0.0, 0.0, 1.0);
+			gl.clear(gl.COLOR_BUFFER_BIT);
+			// 绘制三角形
+			gl.drawArrays(gl.TRIANGLES, 0, n);
+		}
+
+		function initVertexBuffers(/** @type {WebGLRenderingContext} */gl) {
+			const vertices = new Float32Array([
+				0.0, 0.5, -0.5, -0.5, 0.5, -0.5
+			])
+			const n = 3;
+
+			// 创建缓冲区对象
+			const vertexBuffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+			gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+			const a_Position = gl.getAttribLocation(gl.program, 'a_Position');
+			gl.vertexAttribPointer(a_Position, 2, gl.FLOAT, false, 0, 0);
+			gl.enableVertexAttribArray(a_Position);
+			return n;
+		}
+
+		main();
+
+	</script>
+</body>
+
+</html>
